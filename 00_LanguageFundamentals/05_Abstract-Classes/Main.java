@@ -1,4 +1,3 @@
-package com.meshale.JavaLangTraining;
 
 public class Main {
 
