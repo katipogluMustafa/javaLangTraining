@@ -202,3 +202,194 @@ public interface Collection
 * Just implement the methods in the interface.
 ---
 
+An important use for default methods is interface evolution. 
+
+* Consider, for example, the Collection interface that has been a part of Java for many years. Suppose that a long time ago, you provided a class
+    ```java
+    public class Bag implements Collection
+    ```
+    * Later, in Java 8, a stream method was added to the interface.
+    
+    * Suppose the stream method was not a default method. 
+    
+    * Then the Bag class would no longer compile since it doesn’t implement the new method. 
+    
+    * Adding a nondefault method to an interface is not source-compatible.
+    
+    * But suppose you don’t recompile the class and simply use an old JAR file containing it. 
+    
+    * The class will still load, even with the missing method.
+    
+    * Making the method a default method solves problems. 
+  
+---
+
+### Resolving Default Method Conflicts
+
+What happens if the exact same method is defined as a default method in one interface and then again as a method of a superclass or another interface?
+
+Here they are:
+
+1. Superclasses win. If a superclass provides a concrete method, default methods with the same name and parameter types are simply ignored.
+
+2. Interfaces clash. If an interface provides a default method, and another interface contains a method with the same name and parameter types (default or not), then you must resolve the conflict by overriding that method.
+
+#### Let's first look at the Rule 2 Explanation
+
+```
+interface Person
+{
+   default String getName() { return ""; };
+}
+interface Named
+{
+   default String getName() { return getClass().getName() + "_" + hashCode(); }
+}
+```
+
+* What happens if you form a class that implements both of them?
+
+```
+class Student implements Person, Named { . . . }
+```
+
+*  Simply provide a getName method in the Student class. In that method, you can choose one of the two conflicting methods, like this
+    
+    ```
+    class Student implements Person, Named 
+    {
+       public String getName() { return Person.super.getName(); }
+       . . .
+    }
+    ```
+
+#### Now, Let's look at Rule 1 Explanation
+
+```java
+class Student extends Person implements Named { . . . }
+```
+
+* In that case, only the superclass method matters, and any default method from the interface is simply ignored. 
+    * In our example, Student inherits the getName method from Person, and it doesn’t make any difference whether the Named interface provides a default for getName or not. 
+    * This is the “class wins” rule.  
+    
+## The Comparator Interface
+
+Now suppose we want to sort strings by increasing length, not in dictionary order. We can’t have the String class implement the compareTo method in two ways—and at any rate, the String class isn’t ours to modify.
+
+To deal with this situation, there is a second version of the Arrays.sort method whose parameters are an array and a comparator—an instance of a class that implements the Comparator interface.
+
+```
+public interface Comparator<T> 
+{
+   int compare(T first, T second);
+}
+```
+* To compare strings by length, define a class that implements Comparator<String>: 
+```java
+class LengthComparator implements Comparator<String> 
+{
+   public int compare(String first, String second) 
+   {
+      return first.length() - second.length();
+   }
+}
+```
+* To actually do the comparison, you need to make an instance:
+    ```java
+    var comp = new LengthComparator();
+    if (comp.compare(words[i], words[j]) > 0) . . .
+    ```
+    * Even though the LengthComparator object has no state, you still need to make an instance of it. You need the instance to call the compare method—it is not a static method.
+    * To sort an array, pass a LengthComparator object to the Arrays.sort method:
+    ```
+    String[] friends = { "Peter", "Paul", "Mary" };
+    Arrays.sort(friends, new LengthComparator());
+    ```
+
+## Object Cloning
+Cloneable interface indicates that a class has provided a safe clone method.
+
+* To understand what cloning means, recall what happens when you make a copy of a variable holding an object reference.
+ 
+    ![](img/3.jpg)
+ 
+ ```java
+ var original = new Employee("John Public", 50000);
+ Employee copy = original;
+ copy.raiseSalary(10); // oops--also changed original
+ ```
+ 
+ ```java
+ Employee copy = original.clone();
+ copy.raiseSalary(10); // OK--original unchanged
+ ```
+ 
+ * But it isn’t quite so simple. 
+ 
+ * The clone method is a protected method of Object, which means that your code cannot simply call it.
+ * To visualize that, consider the Employee class
+    * As you can see, the default cloning operation is “shallow”—it doesn’t clone objects that are referenced inside other objects.
+    ![](img/4.jpg)
+    * If the subobject shared between the original and the shallow clone is immutable, then the sharing is safe. 
+    * Quite frequently, however, subobjects are mutable, and you must redefine the clone method to make a deep copy that clones the subobjects as well.
+
+* For every class, you need to decide whether
+    1. The default clone method is good enough;
+
+    2. The default clone method can be patched up by calling clone on the mutable subobjects; or
+
+    3. clone should not be attempted.
+ 
+* The third option is actually the default. To choose either the first or the second option, a class must
+    1. Implement the **Cloneable interface**; and
+      
+    2. Redefine the clone method with the public access modifier.
+
+---
+
+ * The clone method is declared protected in the Object class, so that your code can’t simply call anObject.clone(). But aren’t protected methods accessible from any subclass, and isn’t every class a subclass of Object? 
+    * Fortunately, the rules for protected access are more subtle. 
+    * A subclass can call a protected clone method only to clone its own objects. 
+    * You must redefine clone to be public to allow objects to be cloned by any method.
+
+---
+
+* Cloneable interface does not specify the clone method—that method is inherited from the Object class. 
+    * The interface merely serves as a tag, indicating that the class designer understands the cloning process. 
+    * Objects are so paranoid about cloning that they generate a checked exception if an object requests cloning but does not implement that interface.
+
+* The Cloneable interface is one of a handful of tagging interfaces that Java provides. (Some programmers call them marker interfaces.)
+    * A tagging interface has no methods; its only purpose is to allow the use of instanceof in a type inquiry:
+        ```java
+        if (obj instanceof Cloneable) . . .
+        ```
+        
+* Even if the default (shallow copy) implementation of clone is adequate, you still need to implement the Cloneable interface, redefine clone to be public, and call super.clone().
+    ```
+    class Employee implements Cloneable
+    {
+       // public access, change return type
+       public Employee clone() throws CloneNotSupportedException
+       {
+          return (Employee) super.clone();
+       }
+       . . .
+    }
+    ```
+    * The clone method that you just saw adds no functionality to the shallow copy provided by Object.clone.
+* To make a deep copy, you have to work harder and clone the mutable instance fields.
+    ```java
+    class Employee implements Cloneable
+    {
+       . . .
+       public Employee clone() throws CloneNotSupportedException
+       {
+          // call Object.clone()
+          Employee cloned = (Employee) super.clone();
+          // clone mutable fields
+          cloned.hireDay = (Date) hireDay.clone();
+          return cloned;
+       }
+    }
+    ```
