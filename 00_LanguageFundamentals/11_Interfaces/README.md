@@ -69,7 +69,73 @@ class Employee implements Comparable<Employee>
 ![](img/2.png)
 
 ----
-![](img/3.png)
-![](img/4.png)
-![](img/5.png)
-![](img/6.png)
+
+* As with the equals method, problems can arise when inheritance comes into play.
+    * x.compareTo(y) must throw an exception if y.compareTo(x) throws an exception.
+    ```java
+    class Manager extends Employee
+    {
+       public int compareTo(Employee other)
+       {
+          Manager otherManager = (Manager) other; // NO
+          . . .
+       }
+       . . .
+    }
+    ```
+    * That violates the “antisymmetry” rule. If x is an Employee and y is a Manager, then the call x.compareTo(y) doesn’t throw an exception—it simply compares x and y as employees. But the reverse, y.compareTo(x), throws a ClassCastException.
+* If subclasses have different notions of comparison, then you should outlaw comparison of objects that belong to different classes. 
+    * Each compareTo method should start out with the test
+       ```java
+         if (getClass() != other.getClass()) throw new ClassCastException();
+       ```
+    * If there is a common algorithm for comparing subclass objects, simply provide a single compareTo method in the superclass and declare it as final.
+    * For example, suppose you want managers to be better than regular employees, regardless of salary. 
+        * What about other subclasses such as Executive and Secretary? 
+        * If you need to establish a pecking order, supply a method such as rank in the Employee class. 
+        * Have each subclass override rank, and implement a single compareTo method that takes the rank values into account.
+    
+---
+
+## Properties of Interfaces
+
+* Even though you can’t construct interface objects, you can still declare interface variables.
+    ```java
+    Comparable x; // OK
+    ```
+    * An interface variable must refer to an object of a class that implements the interface:
+    ```java
+    x = new Employee(. . .); // OK provided Employee implements Comparable
+    ```
+* Next, just as you use instanceof to check whether an object is of a specific class, you can use instanceof to check whether an object implements an interface:
+    ```java
+    if (anObject instanceof Comparable) { . . . }
+    ```
+* Just as you can build hierarchies of classes, you can extend interfaces. 
+    * This allows for multiple chains of interfaces that go from a greater degree of generality to a greater degree of specialization.
+        ```
+        public interface Moveable
+        {
+           void move(double x, double y);
+        }
+        ```
+        ```
+        public interface Powered extends Moveable
+        {
+           double milesPerGallon();
+        }
+        ```
+* Although you cannot put instance fields in an interface, you can supply constants in them.
+    * Just as methods in an interface are automatically public, fields are always public static final.
+    ```
+    public interface Powered extends Moveable
+    {
+       double milesPerGallon();
+       double SPEED_LIMIT = 95; // a public static final constant
+    }
+    ```
+* While each class can have only one superclass, classes can implement multiple interfaces. 
+    ```
+    class Employee implements Cloneable, Comparable
+    ```
+    
