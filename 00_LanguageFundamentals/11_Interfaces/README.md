@@ -133,9 +133,72 @@ class Employee implements Comparable<Employee>
        double milesPerGallon();
        double SPEED_LIMIT = 95; // a public static final constant
     }
-    ```
+    ``` 
 * While each class can have only one superclass, classes can implement multiple interfaces. 
     ```
     class Employee implements Cloneable, Comparable
     ```
     
+## Static and Private Methods
+
+* As of Java 8, you are allowed to add static methods to interfaces.
+
+* When you implement your own interfaces, there is no longer a reason to provide a separate companion class for utility methods.
+
+* As of Java 9, methods in an interface can be private. 
+    * A private method can be static or an instance method. 
+    * Since private methods can only be used in the methods of the interface itself, their use is limited to being helper methods for the other methods of the interface.
+
+```java
+public interface Path
+{
+   public static Path of(URI uri) { . . . }
+   public static Path of(String first, String... more) { . . . }
+   . . .
+}
+```
+
+## Default Methods
+You can supply a default implementation for any interface method. You must tag such a method with the default modifier.
+
+```java
+public interface Comparable<T> 
+{
+   default int compareTo(T other) { return 0; }
+      // by default, all elements are the same
+}
+```
+
+```
+public interface Iterator<E>
+{
+   boolean hasNext();
+   E next();
+   default void remove() { throw new UnsupportedOperationException("remove"); }
+   . . .
+}
+```
+
+* A default method can call other methods.
+
+```
+public interface Collection
+{
+   int size(); // an abstract method
+   default boolean isEmpty() { return size() == 0; }
+   . . .
+}
+```
+* Then a programmer implementing Collection doesn’t have to worry about implementing an isEmpty method.
+
+---
+
+* The Collection interface in the Java API does not actually do this. 
+  * Instead, there is a class AbstractCollection that implements Collection and defines isEmpty in terms of size. 
+  * Implementors of a collection are advised to extend AbstractCollection. 
+  
+* That technique is obsolete. 
+
+* Just implement the methods in the interface.
+---
+
