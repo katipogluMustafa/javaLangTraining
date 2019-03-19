@@ -66,3 +66,13 @@ Sometimes, a lambda expression involves a single method.
         //is equivalent to 
         (x, y) -> Math.pow(x, y)
         ```
+![](img/1.png)
+![](img/2.png)
+
+> Note that a lambda expression can only be rewritten as a method reference if the body of the lambda expression calls a single method and doesn’t do anything else.
+```
+s -> s.length() == 0
+
+// There is a single method call. 
+// But there is also a comparison, so you can’t use a method reference here.
+```
