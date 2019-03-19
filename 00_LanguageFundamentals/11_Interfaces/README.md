@@ -393,3 +393,23 @@ Cloneable interface indicates that a class has provided a safe clone method.
        }
     }
     ```
+    
+ * The clone method of the Object class threatens to throw a **CloneNotSupportedException**
+    * It does that whenever clone is invoked on an object whose class does not implement the Cloneable interface. 
+    * Of course, the Employee and Date classes implement the Cloneable interface, so the exception won’t be thrown. 
+    * However, the compiler does not know that. Therefore, we declared the exception
+       ```
+       public Employee clone() throws CloneNotSupportedException
+       ```
+ * Should you implement clone in your own classes? 
+    * If your clients need to make deep copies, then you probably should.
+    * Less than 5 percent of the classes in the standard library implement clone.
+ 
+ * All array types have a clone method that is public, not protected. 
+    *You can use it to make a new array that contains copies of all elements. For example:
+    ```
+     int[] luckyNumbers = { 2, 3, 5, 7, 11, 13 };
+     int[] cloned = luckyNumbers.clone();
+     cloned[5] = 12; // doesn't change luckyNumbers[5]; 
+    ```
+ 
