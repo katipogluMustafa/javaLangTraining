@@ -107,7 +107,7 @@ OuterClass.InnerClass innerObject = outerObject.new InnerClass();
 
 * Inner classes can not have static declarations.
 
-```
+```java
 // Java program to demonstrate accessing 
 // a inner class 
   
