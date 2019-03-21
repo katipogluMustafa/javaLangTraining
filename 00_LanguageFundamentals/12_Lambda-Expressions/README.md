@@ -54,3 +54,9 @@ ActionListener listener = event ->
 ```java
 (int x) -> { if (x >= 0) return 1; } // invalid
 ```
+
+## Notes
+
+* Value of the `this` reference inside any lambda expression is the same as outside of the lambda expression.
+    * `this` reference is unchanged by the lambda expresion.
+    
