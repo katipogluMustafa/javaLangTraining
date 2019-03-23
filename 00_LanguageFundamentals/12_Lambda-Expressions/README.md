@@ -1,16 +1,28 @@
 # Lambda Expressions
 
-Consider again the sorting example from the preceding section. We pass code that checks whether one string is shorter than another.
+ ````java
+class LengthComparator implements Comparator<String> 
+{
+   public int compare(String first, String second) 
+   {
+      return first.length() - second.length();
+   }
+}
+````
+ 
+ We pass code that checks whether one string is shorter than another.
 
 ```java
 first.length() - second.length()
 ```
 
+```java
+(String first, String second)
+   -> first.length() - second.length()
+```
+
 * What are first and second? They are both strings. Java is a strongly typed language, and we must specify that as well:
-    ```java
-    (String first, String second)
-       -> first.length() - second.length()
-    ```
+
     * You have just seen your first lambda expression.
 
 * If the code carries out a computation that doesn’t fit in a single expression, write it exactly like you would have written a method: enclosed in {} and with explicit return statements.
