@@ -412,4 +412,10 @@ Cloneable interface indicates that a class has provided a safe clone method.
      int[] cloned = luckyNumbers.clone();
      cloned[5] = 12; // doesn't change luckyNumbers[5]; 
     ```
- 
+
+## Notes
+
+* You can use interfaces with instanceof operator.
+    * if this check passes, you can also cast to an interface.
+* Fields are automatically public static final
+* You can't have 
