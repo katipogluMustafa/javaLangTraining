@@ -95,3 +95,62 @@ public static <T extends Comparable & Cloneable> T min(T[] a) ...
             return new Pair<>(min,max);
         }
     ````
+    
+## Limitations of Java generics
+
+* Since type variables are erased to Object, they don't work for primitive types.
+
+* instanceof test only works with raw types not with generics.
+
+* Casts with parameterized types gives warning.
+
+* getClass() returns raw type for generic types.
+
+* Can not make generic array, but ArrayList is possible
+    ````java
+        Pair<String>[] arr = new Pair<String>[10];    // Error
+    ````
+* Varargs are allowed since we just read from the array not store anything.
+    * Use @SafeVarargs annotation after you make sure no one writes to this array, it is only read from.
+
+* When implementing generics, you can not instantiate a generic type
+    ````java
+      public Pair(){first = new T(); second = new T(); } // error
+    ````     
+    * But you can use constructor expressions
+        ````java
+         public static <T> Pair<T> makePair(Supplier<T> constructor){
+                return new Pair<>( constructor.get(), constructor.get() );
+          }
+        // Example usage
+        Pair<String> stringPair = Pair.makePair( String::new );
+        ````
+    * Traditionally, by using reflection
+        ````java
+          public static <T> Pair<T> makePair(Class<T> cl) throws ...{
+              return new Pair<>( cl.newInstance(), cl.newInstance() );
+          }
+          // Example usage
+        Pair<String> stringPair = Pair.makePair( String.class );
+        ````
+        
+    * Reflection is always less efficient than using constructor expressions
+
+* Constructing generic arrays is not possible normally.
+    * If you have existing array, you can use reflection
+        ````java
+        public static <T extends Comparable> Pair<T> minmax(T... a) {
+            T[] mm = (T[])Array.newInstance(a.getClass().getComponentType(), 2);
+            ...
+        }
+        ````
+    * Or you can use constructor expressions with arrays
+        ````java
+          public static <T extends Comparable> T[] minmax(IntFunction<T[]> constructor, T... a){
+            T[] minMax = constructor.apply(2);
+            ...
+          }
+          
+          // Calling
+          String s = MyClass.minmax(String[]::new, "X","Y","Z");
+        ```` 
