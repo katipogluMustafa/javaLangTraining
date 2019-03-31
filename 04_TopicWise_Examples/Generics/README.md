@@ -98,3 +98,16 @@ public static <T extends Comparable & Cloneable> T min(T[] a) ...
             return new Pair<>(min,max);
         }
     ````
+    
+## INHERITANCE RULES FOR GENERIC TYPES
+
+![](img/1.jpg)
+
+* Subtype relationships among generic list types
+    ![](img/2.jpg)
+
+
+## WILDCARD TYPES
+
+* For those situations that you want to have inheritance relationships, you can use wildcard types.
+
