@@ -16,7 +16,10 @@ public class MemoryManagement {
     }
 
     public void addProcess(Process p){
-        Integer nextAddress = availableAddr.poll();
+        Integer nextAddress;
+        if( availableAddr != null)
+            nextAddress = availableAddr.poll();
+
         if( nextAddress != null)
             processes.put( nextAddress ,p);
         else
@@ -24,8 +27,10 @@ public class MemoryManagement {
     }
 
     public Process removeProcess(Integer id){
-        Process s = processes.remove(id);
-        if( s != null)
+        Process s;
+        if( processes != null)
+            s = processes.remove(id);
+        if( s != null && availableAddr != null)
             availableAddr.add(id);
         System.out.println("******************************************** " + id + " nolu adresteki process çıkarıldi");
         return s;
