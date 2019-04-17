@@ -22,6 +22,13 @@ public class Test {
         System.out.println("Math.log(Math.E)\t = \t\t" + log(Math.E));
         System.out.println("Math.log10(Math.E)\t = \t\t" + log10(Math.E));
 
+        System.out.println("Math.E\t\t\t\t = \t\t" + E);
+        System.out.println("Math.PI\t\t\t\t = \t\t" + PI);
+
+        System.out.println("Math.acos(45)\t\t = \t\t" + acos(90));
+        System.out.println("Math.asin(45)\t\t = \t\t" + asin(0));
+        System.out.println("Math.atan(45)\t\t = \t\t" + atan(45));
+
 
     }
 }
