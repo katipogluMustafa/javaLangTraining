@@ -44,6 +44,12 @@ public class Main {
         } );
         // then call myThreadd.start();
 
+        Thread t = new Thread(()->{
+            System.out.println("Running from " + Thread.currentThread().getName() );
+        });
+        t.setName("New Name of the thread");        // set the thread name
+        t.start();
+
     }
 
 }
